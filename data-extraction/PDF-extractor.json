@@ -1,0 +1,200 @@
+// As JSON is a data only format, comments are not allowed in JSON files. Remember to remove them before using the JSON in n8n.
+// This is a sample workflow for extracting data from a PDF file using n8n and Google Gemini 2.0 Flash.
+// The workflow uses the HTTP Request node to fetch the PDF file, the HTML node to extract the content, and the Gemini 2.0 Flash node to process the data.
+// The workflow is designed to be run in n8n, a powerful open-source workflow automation tool.{
+  "nodes": [
+    {
+      "parameters": {
+        "url": "URL", // Example - Remember to replace URL with the full url you want to use in your query
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -800,
+        440
+      ],
+      "id": "db52ba59-0886-4e79-b09e-a91220b02f65",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "URL",
+              "cssSelector": "#ContentPlaceHolder1_repGroups_panItemVisibility_11 > div.document-list__items a", // Example - Remember to find the correct selector for your usecase.
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": true
+            },
+            {}
+          ]
+        },
+        "options": {
+          "trimValues": true,
+          "cleanUpText": true
+        }
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -580,
+        440
+      ],
+      "id": "1cab2ad4-c968-48ec-a178-8f3f4a1c1111",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "url": "=URL{ $json.URL[0] }}", // Example - Remember to replace URL with the base url in your query
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -360,
+        440
+      ],
+      "id": "70f04963-85b1-4211-b02d-9e024be1e2c9",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {
+          "encoding": "utf8"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        80,
+        440
+      ],
+      "id": "5530062d-bd38-48d5-b6fd-37817c8ea80e",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/path/to-folder{{$binary.data.fileName }}", // Example - remember to enter full path to the folder where you want to save the file
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        440
+      ],
+      "id": "79eef369-3f29-4a34-b8ea-f7fbfd3fef12",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.candidates[0].content.parts[0].text;\nconst clean = raw.trim().replace(/^```json|```$/g, '');\nreturn JSON.parse(clean);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        440
+      ],
+      "id": "7c22546f-48de-4d44-b315-15bfac94e9d2",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [\n   {\n  \"text\": \"Teksten under er hentet fra en PDF-ukeplan. Originalt var innholdet strukturert som tabell med dager (MANDAG, TIRSDAG, ONSDAG, TORSDAG), samt seksjonene INFORMASJON og KONTAKT. Gi svaret KUN som gyldig JSON-objekt uten innpakning i ```json``` , ```\\n``` eller andre formateringer. Ikke inkluder noen ekstra tekst.\"},\n      {\n        \"inline_data\": {\n          \"mime_type\": \"application/pdf\",\n          \"data\": \"{{ $json.data }}\"\n        }\n      }\n    ]\n  }]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        440
+      ],
+      "id": "eb7d0434-68c3-4aad-98e4-4164f452ec5d",
+      "name": "Gemini 2.0 Flash"
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Gemini 2.0 Flash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini 2.0 Flash": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  }
+}
