@@ -32,8 +32,6 @@ Importing
 Because too many useful workflows, tricks, and solutions disappear into Slack chats, blog posts, or random Notion pages.
 This is my own toolbox — but you’re welcome to use it, fork it, and adapt it.
 
-⸻
-
 # 🔥 Next
 	•	Add a proper folder structure for categories (e.g. PDF, API, Google, FileOps)
 	•	More examples coming soon (API integrations, CSV parsing, file monitoring, and more)
@@ -42,7 +40,5 @@ This is my own toolbox — but you’re welcome to use it, fork it, and adapt it
 Contributions & ideas welcome.
 If you find something broken or have a better way — feel free to open an issue or a PR.
 
-⸻
-
-Stay restless. Automate everything.
-— Hassan
+**Stay restless. Automate everything.**
+**— Hassan**

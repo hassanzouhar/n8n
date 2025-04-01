@@ -8,4 +8,3 @@ This workflow does the following:
 	5.	Extracts raw text content
 	6.	Processes the PDF content via Gemini 2.0 Flash API
 	7.	Cleans up and parses the JSON output
-
