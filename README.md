@@ -21,11 +21,9 @@ All inline comments in the workflow examples must be removed before pasting them
 # 🚀 Usage
 You can copy any workflow from this repo and import it directly into your n8n instance.
 Importing
-	1.	Copy the .json workflow file.
-	2.	In n8n, click Import Workflow → Paste JSON.
-	3.	Remove any comments (// ...) before importing.
-
-⸻
+	•	Copy the .json workflow file.
+	•	In n8n, click Import Workflow → Paste JSON.
+	•	Remove any comments (// ...) before importing.
 
 # 📌 Why This Repo?
 
