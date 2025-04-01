@@ -2,6 +2,7 @@
 // This is a sample workflow for extracting data from a PDF file using n8n and Google Gemini 2.0 Flash.
 // The workflow uses the HTTP Request node to fetch the PDF file, the HTML node to extract the content, and the Gemini 2.0 Flash node to process the data.
 // The workflow is designed to be run in n8n, a powerful open-source workflow automation tool.
+
 {
   "nodes": [
     {
